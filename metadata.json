@@ -1,0 +1,7 @@
+{
+  "name": "EduTrocado Pro",
+  "description": "Uma aplicação completa para gestão de turmas, permitindo o controlo de presenças, participação, TPC e análise estatística do desempenho dos alunos.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
