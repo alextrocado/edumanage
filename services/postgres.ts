@@ -1,16 +1,18 @@
 
 import { AppData } from '../types';
 
+/**
+ * PostgresService agora funciona exclusivamente como um cliente HTTP.
+ * Não importa @vercel/postgres para evitar erros de build no browser.
+ */
 export class PostgresService {
-  /**
-   * No novo modelo API, o init não precisa de configurar strings no frontend.
-   */
   init(url: string) {
-    console.debug("PostgresService: Utilizando API Proxy Serverless.");
+    // No modelo API, a configuração é gerida no servidor
+    console.debug("PostgresService: Ligado via Proxy API /api/db");
   }
 
   async ensureTable() {
-    // A tabela é garantida na chamada da API
+    // A inicialização da tabela é feita pela API no servidor
     return true;
   }
 
@@ -18,12 +20,14 @@ export class PostgresService {
     try {
       const response = await fetch(`/api/db?userId=${encodeURIComponent(userId)}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(data),
       });
       return response.ok;
     } catch (err) {
-      console.error("Erro ao sincronizar via API:", err);
+      console.error("Erro na sincronização Cloud:", err);
       return false;
     }
   }
@@ -32,17 +36,17 @@ export class PostgresService {
     try {
       const response = await fetch(`/api/db?userId=${encodeURIComponent(userId)}`);
       if (response.ok) {
-        return await response.json();
+        const data = await response.json();
+        return data as AppData;
       }
       return null;
     } catch (err) {
-      console.error("Erro ao ler via API:", err);
+      console.error("Erro ao recuperar dados da Cloud:", err);
       return null;
     }
   }
 
   async listAllSyncs() {
-    // Implementar se necessário listar múltiplos utilizadores
     return [];
   }
 }
