@@ -1,29 +1,25 @@
 
-import { put } from '@vercel/blob';
-
 export class BlobService {
   /**
-   * Faz upload de um ficheiro para o Vercel Blob e retorna o URL público.
+   * Faz upload de um ficheiro via Proxy API para segurança.
    */
   async uploadImage(file: File | Blob, fileName: string): Promise<string> {
     try {
-      // O token deve estar em process.env.BLOB_READ_WRITE_TOKEN no Vercel
-      const token = process.env.BLOB_READ_WRITE_TOKEN;
-      
-      const { url } = await put(fileName, file, {
-        access: 'public',
-        token: token
+      const response = await fetch(`/api/upload?filename=${encodeURIComponent(fileName)}`, {
+        method: 'POST',
+        body: file,
       });
-      return url;
+
+      if (!response.ok) throw new Error("Falha no upload via API");
+      
+      const data = await response.json();
+      return data.url;
     } catch (error) {
-      console.error("Erro no upload para Vercel Blob:", error);
-      throw new Error("Falha ao guardar imagem na cloud. Verifique o token do Vercel Blob.");
+      console.error("Erro no upload:", error);
+      throw new Error("Falha ao guardar imagem. Verifique a ligação.");
     }
   }
 
-  /**
-   * Converte uma string base64 para Blob.
-   */
   base64ToBlob(base64: string, mimeType: string = 'image/jpeg'): Blob {
     const byteCharacters = atob(base64);
     const byteNumbers = new Array(byteCharacters.length);
