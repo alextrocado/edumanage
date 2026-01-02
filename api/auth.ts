@@ -1,3 +1,4 @@
+
 export const config = {
   runtime: 'edge',
 };
@@ -10,13 +11,9 @@ export default async function handler(req: Request) {
   try {
     const { user, password } = await req.json();
     
-    // Variáveis de ambiente lidas estritamente no servidor
+    // Variáveis de ambiente lidas apenas no servidor
     const adminUser = process.env.ADMIN_USER;
     const adminPass = process.env.ADMIN_PASSWORD;
-
-    if (!adminUser || !adminPass) {
-        return new Response(JSON.stringify({ error: 'Configuração do servidor incompleta (env missing).' }), { status: 500 });
-    }
 
     if (user === adminUser && password === adminPass) {
       return new Response(JSON.stringify({ 
@@ -28,11 +25,11 @@ export default async function handler(req: Request) {
       });
     }
 
-    return new Response(JSON.stringify({ success: false, error: 'Credenciais administrativas inválidas.' }), {
+    return new Response(JSON.stringify({ success: false, error: 'Credenciais administrativas inválidas' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Erro interno na API de Autenticação.' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'Erro interno no servidor de autenticação' }), { status: 500 });
   }
 }
